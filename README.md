@@ -5,7 +5,6 @@ Here, we provide the official pytorch implementation of the paper "Adjacent-leve
 ![Net-Architecture](https://user-images.githubusercontent.com/66511993/210692766-5c698bdd-5077-4e7b-8274-c899f86b3cf9.png)
 
 
-
 # Requirements
 * python        3.9.12
 * numpy         1.23.1
@@ -16,7 +15,7 @@ Here, we provide the official pytorch implementation of the paper "Adjacent-leve
 ## Data Structure
 """
 Change detection data set with pixel-level binary labels;
-├─A
+├─A  
 ├─B
 ├─label
 └─list
