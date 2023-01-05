@@ -173,11 +173,6 @@ def train(train_loader, model, optimizer, criterion, scheduler, epoch, tool4metr
         bin_preds_mask = (pred_s.to('cpu') > 0.5).detach().numpy().astype(int)
         mask = gts.to('cpu').numpy().astype(int)
 
-        # out_png = bin_preds_mask.squeeze(0)
-        # out_mask = mask.squeeze(0)
-        # cv2.imwrite('./pred.png', out_png)
-        # cv2.imwrite('./mask.png', out_mask)
-
         tool4metric.update_cm(pr=bin_preds_mask, gt=mask)
 
         # gts_temp = gts.data.cpu().numpy().flatten()
