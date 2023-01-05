@@ -37,7 +37,7 @@ SYSU-CD: https://github.com/liumency/SYSU-CD
 train.py  
 Test.py
 
-% # Pre-trained models
+% Pre-trained models  
 % The three dataset pre-trained models are available.
 
 
