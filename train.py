@@ -1,66 +1,35 @@
-import datetime
-import numpy
 import os
-import copy
-import time
-import json
 import argparse
-import torch
-import cv2
-import torch.nn as nn
-import torchvision
-import torch.nn.functional as F
-from torch.utils.data import DataLoader
-# from sklearn.metrics import precision_recall_fscore_support as prfs
-# from utils.data import get_loader
-from utils.func import AvgMeter, clip_gradient
-from utils.lr_scheduler import get_scheduler
-from utils.dataset import MyDataset
-from utils.helper import set_metrics, get_mean_metrics, initialize_metrics
-from utils.losses import get_criterion
-from model.metric_tool import ConfuseMatrixMeter, AverageMeter, get_confuse_matrix
-from model.cd3d import CD3D_Net
-from model.RD3D_ame import Net_arch
-from utils.loss_f import BCEDICE_loss
-import xlsxwriter
+import copy
+import json
+import os
+import time
 import warnings
-from thop import profile
+
+import torch
+import torchvision
+import xlsxwriter
+from torch.utils.data import DataLoader
+
+from model.Networks import Netmodel
+from model.metric_tool import ConfuseMatrixMeter
+from utils.dataset import MyDataset
+
+from utils.func import AvgMeter, clip_gradient
+from utils.loss_f import BCEDICE_loss
+from utils.lr_scheduler import get_scheduler
+
 warnings.filterwarnings("ignore")
-
-
-# def initialize_metrics():
-#     metrics = {
-#         'cd_precisions': [],
-#         'cd_recalls': [],
-#         'cd_f1scores': [],
-#     }
-#     return metrics
-#
-# def set_metrics(metric_dict, cd_report):
-#     metric_dict['cd_precisions'].append(cd_report[0])
-#     metric_dict['cd_recalls'].append(cd_report[1])
-#     metric_dict['cd_f1scores'].append(cd_report[2])
-#     return metric_dict
-#
-# def get_mean_metrics(metric_dict):
-#     return {k: numpy.mean(v) for k, v in metric_dict.items()}
 
 
 def parse_option():
     parser = argparse.ArgumentParser()
     # data set
     parser.add_argument('--batchsize', type=int, default=8)
-    parser.add_argument('--trainsize', type=int, default=256)
-    parser.add_argument('--hflip', action='store_true', help='hflip data')
-    parser.add_argument('--vflip', action='store_true', help='vflip data')
-    # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\LEVERCD\\ABLabel')
-    parser.add_argument('--data_dir', type=str, default='E:\\AllData\\WHU\\ABLabel')
-    # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\CDD\\ABLabel')
-    # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\CD_Data_GZ\\ABlabel')
+    parser.add_argument('--data_dir', type=str, default='E:\\AllData\\LEVERCD\\ABLabel')
     # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\WHU_dataset\\ABLabel')
     # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\SYSU-CD\\ABLable')
-    # training
-    parser.add_argument('--model', type=str, default='RD3D+', help='RD3D or RD3D+')
+
     parser.add_argument('--epochs', type=int, default=100, help='epoch number')
     parser.add_argument('--optim', type=str, default='adamW', help='optimizer')
     parser.add_argument('--lr', type=float, default=0.001, help='learning rate')       # ori_lr: 0.0001
@@ -81,7 +50,7 @@ def parse_option():
 
     opt, unparsed = parser.parse_known_args()
     opt.output_dir = os.path.join(opt.output_dir, str(int(time.time())))
-    # opt.output_dir = os.path.join(opt.output_dir, f'/{datetime.datetime.now().strftime("%Y%m%d-%H%M%S")}/')
+
     return opt
 
 def build_loader(opt):
@@ -94,7 +63,7 @@ def build_loader(opt):
 def build_model(opt):
     resnet = torchvision.models.resnet50(pretrained=True)
     # model = CD3D_Net(32, copy.deepcopy(resnet))
-    model = Net_arch(32, copy.deepcopy(resnet))
+    model = Netmodel(32, copy.deepcopy(resnet))
     model = model.cuda()
     return model
 
@@ -113,7 +82,7 @@ def main(opt):
     print("Number of model parameters {}".format(parameters_tot))
 
     # 定义写出行列号
-    train_hook = xlsxwriter.Workbook('WHU_0-001_train.xlsx')
+    train_hook = xlsxwriter.Workbook('WHU_0-0001_train.xlsx')
     train_record = train_hook.add_worksheet()
     train_record.write('A1', 'epoch')
     train_record.write('B1', 'Pre')
@@ -122,7 +91,7 @@ def main(opt):
     train_record.write('E1', 'IoU')
     train_record.write('F1', 'acc')
     train_record.write('G1', 'loss')
-    val_hook = xlsxwriter.Workbook('WHU_0-001_val.xlsx')
+    val_hook = xlsxwriter.Workbook('WHU_0-0001_val.xlsx')
     val_record = val_hook.add_worksheet()
     val_record.write('A1', 'epoch')
     val_record.write('B1', 'Pre')
@@ -190,8 +159,9 @@ def train(train_loader, model, optimizer, criterion, scheduler, epoch, tool4metr
         # flops, params = profile(model, (images,))
         # print('flops:', flops, 'params:', params)
         # print('flops: %.2f M, params: %.2f M' % (flops / 1000000000.0, params / 1000000.0))
+
         # forward
-        pred_s, te2, te3, te4, te5 = model(images)
+        pred_s = model(images)
         pred_s = pred_s.squeeze(1)
         loss = criterion(pred_s, gts)
         loss.backward()
@@ -254,7 +224,7 @@ def val(val_loader, model, criterion, epoch, tool4metric, val_record, row, col):
             imageB = imageB.unsqueeze(2)
             images = torch.cat([imageA, imageB], 2)
 
-            pred_s, de1, de2, de3, de4 = model(images)
+            pred_s  = model(images)
             # pred_s = model(images)
             pred_s = pred_s.squeeze(1)
 
@@ -305,22 +275,6 @@ if __name__ == '__main__':
     print("\n full config save to {}".format(path))
 
     main(opt)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
