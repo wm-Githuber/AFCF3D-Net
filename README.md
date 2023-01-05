@@ -15,11 +15,11 @@ Here, we provide the official pytorch implementation of the paper "Adjacent-leve
 ## Data Structure
 """
 Change detection data set with pixel-level binary labels;  
->├─A  
->├─B  
->├─label  
->└─list  
->>├─train.txt  
+├─A  
+├─B  
+├─label  
+└─list  
+&emsp├─train.txt  
 >>├─val.txt  
 >>├─test.txt  
 """
