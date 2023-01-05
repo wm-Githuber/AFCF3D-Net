@@ -29,7 +29,9 @@ label: label maps
 list: contrains train.txt, val.txt, and test.txt. each fild records the name of image paris (XXX.png).  
 
 ## Data Download  
-WHU-CD:
+WHU-CD: https://study.rsgis.whu.edu.cn/pages/download/building_dataset.html  
+LEVIR-CD: https://justchenhao.github.io/LEVIR/  
+SYSU-CD: https://github.com/liumency/SYSU-CD  
 
 
  Please wait a moment, the author is sorting out the code.
