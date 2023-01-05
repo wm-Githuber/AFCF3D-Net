@@ -32,7 +32,7 @@ def parse_option():
 
     parser.add_argument('--epochs', type=int, default=100, help='epoch number')
     parser.add_argument('--optim', type=str, default='adamW', help='optimizer')
-    parser.add_argument('--lr', type=float, default=0.001, help='learning rate')       # ori_lr: 0.0001
+    parser.add_argument('--lr', type=float, default=0.0001, help='learning rate')
     parser.add_argument('--lr_scheduler', type=str, default='cosine', choices=['step', 'cosine'])
     parser.add_argument('--warmup_epoch', type=int, default=-1, help='warmup epoch')
     parser.add_argument('--warmup_multiplier', type=int, default=100, help='warmup multiplier')
