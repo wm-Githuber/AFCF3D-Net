@@ -12,5 +12,18 @@ Here, we provide the official pytorch implementation of the paper "Adjacent-leve
 * pytorch       1.12.1
 * torchvision   0.13.1
 
+# Dataset Preparation
+## Data Structure
+"""
+Change detection data set with pixel-level binary labels;
+|-A
+|-B
+|-label
+|-list
+  |--train.txt
+  |--val.txt
+  |--test.txt
+A:
+
 
  Please wait a moment, the author is sorting out the code.
