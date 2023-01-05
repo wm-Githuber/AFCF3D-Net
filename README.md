@@ -19,9 +19,9 @@ Change detection data set with pixel-level binary labels;
 ├─B  
 ├─label  
 └─list  
-   |—train.txt  
-   |—val.txt  
-   |——test.txt  
+>>├─train.txt  
+>>├─val.txt  
+>>├─test.txt  
 """
 A:
 
