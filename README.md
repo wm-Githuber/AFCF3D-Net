@@ -33,5 +33,12 @@ WHU-CD: https://study.rsgis.whu.edu.cn/pages/download/building_dataset.html
 LEVIR-CD: https://justchenhao.github.io/LEVIR/  
 SYSU-CD: https://github.com/liumency/SYSU-CD  
 
+# Training and Testing
+train.py  
+Test.py
 
- Please wait a moment, the author is sorting out the code.
+% # Pre-trained models
+% The three dataset pre-trained models are available.
+
+
+# Citation
