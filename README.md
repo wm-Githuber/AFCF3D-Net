@@ -13,7 +13,7 @@ Here, we provide the official pytorch implementation of the paper "Adjacent-leve
 
 # Dataset Preparation
 ## Data Structure
-"""
+"""  
 Change detection data set with pixel-level binary labels;  
 ├─A  
 ├─B  
@@ -22,7 +22,7 @@ Change detection data set with pixel-level binary labels;
 &emsp;&emsp;├─train.txt  
 &emsp;&emsp;├─val.txt  
 &emsp;&emsp;├─test.txt  
-"""
+"""  
 A:
 
 
