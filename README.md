@@ -23,7 +23,13 @@ Change detection data set with pixel-level binary labels;
 &emsp;&emsp;├─val.txt  
 &emsp;&emsp;├─test.txt  
 """  
-A:
+A: Images of T1 time  
+B: Images of T2 time  
+label: label maps  
+list: contrains train.txt, val.txt, and test.txt. each fild records the name of image paris (XXX.png).  
+
+## Data Download  
+WHU-CD:
 
 
  Please wait a moment, the author is sorting out the code.
