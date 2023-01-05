@@ -14,14 +14,14 @@ Here, we provide the official pytorch implementation of the paper "Adjacent-leve
 # Dataset Preparation
 ## Data Structure
 """
-Change detection data set with pixel-level binary labels;
+Change detection data set with pixel-level binary labels;  
 ├─A  
-├─B
-├─label
-└─list
-   —train.txt
-  |—val.txt
-  |——test.txt
+├─B  
+├─label  
+└─list  
+   |—train.txt  
+   |—val.txt
+   |——test.txt
 """
 A:
 
