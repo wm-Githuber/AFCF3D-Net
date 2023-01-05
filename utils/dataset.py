@@ -99,4 +99,3 @@ def _binarize(mask: np.ndarray) -> np.ndarray:
     return np.clip(mask * 255, 0, 1).astype(int)
 
 
-
