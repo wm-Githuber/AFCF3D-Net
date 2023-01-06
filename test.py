@@ -67,7 +67,6 @@ else:
 
 # loop to evaluate the model and print the metrics
 bce_loss = 0.0
-# criterion = torch.nn.BCELoss()
 criterion = BCEDICE_loss
 tool_metric = ConfuseMatrixMeter(n_class=2)
 
