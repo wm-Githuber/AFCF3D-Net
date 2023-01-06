@@ -129,15 +129,15 @@ def main(opt):
         val(val_loader, model, CE, epoch, tool4metric, val_record, row, col)
         print('epoch {}, total time {:.2f}'.format(epoch, (time.time() - tic)))
         if epoch >= 80:
-            torch.save(model.state_dict(), os.path.join(opt.output_dir, f"RD3D_{epoch}_ckpt.pth"))
-            print("model saved {}!".format(os.path.join(opt.output_dir, f"RD3D_{epoch}_ckpt.pth")))
+            torch.save(model.state_dict(), os.path.join(opt.output_dir, f"model3D_{epoch}_ckpt.pth"))
+            print("model saved {}!".format(os.path.join(opt.output_dir, f"model3D_{epoch}_ckpt.pth")))
         row = row + 1
 
-    torch.save(model.state_dict(), os.path.join(opt.output_dir, f"RD3D_last_ckpt.pth"))
-    print("model saved {}!".format(os.path.join(opt.output_dir, f"RD3D_ckpt.pth")))
+    torch.save(model.state_dict(), os.path.join(opt.output_dir, f"model3D_last_ckpt.pth"))
+    print("model saved {}!".format(os.path.join(opt.output_dir, f"model3D_ckpt.pth")))
     train_hook.close()
     val_hook.close()
-    os.path.join(opt.output_dir, f"RD3D_last_ckpt.pth")
+    os.path.join(opt.output_dir, f"model3D_last_ckpt.pth")
 
 
 def train(train_loader, model, optimizer, criterion, scheduler, epoch, tool4metric, train_record, row, col):
