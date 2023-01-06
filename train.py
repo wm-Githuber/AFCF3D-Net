@@ -62,7 +62,6 @@ def build_loader(opt):
 
 def build_model(opt):
     resnet = torchvision.models.resnet50(pretrained=True)
-    # model = CD3D_Net(32, copy.deepcopy(resnet))
     model = Netmodel(32, copy.deepcopy(resnet))
     model = model.cuda()
     return model
