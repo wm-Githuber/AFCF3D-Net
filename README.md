@@ -46,7 +46,7 @@ Test.py
 # Pre-trained
 The pretrained models can be downloaded at:  
 address：https://pan.baidu.com/s/1Zg_zdMyHIa9V_s3TO-o9pw 
-password：ntjm
+password：ntjw
 
 # Licence
 The code is released for non-commercial and reseach purposes only. For commercial purposes, please contact the authors.
