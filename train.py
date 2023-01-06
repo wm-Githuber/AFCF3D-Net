@@ -27,7 +27,7 @@ def parse_option():
     # data set
     parser.add_argument('--batchsize', type=int, default=8)
     parser.add_argument('--data_dir', type=str, default='E:\\AllData\\LEVERCD\\ABLabel')
-    # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\WHU_dataset\\ABLabel')
+    # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\WHU\\ABLabel')
     # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\SYSU-CD\\ABLable')
 
     parser.add_argument('--epochs', type=int, default=100, help='epoch number')
