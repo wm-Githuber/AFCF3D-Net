@@ -49,7 +49,7 @@ address：https://pan.baidu.com/s/1Zg_zdMyHIa9V_s3TO-o9pw
 password：ntjw
 
 # Licence
-The code is released for non-commercial and reseach purposes only. For commercial purposes, please contact the authors.
+The code is released for non-commercial and research purposes only. For commercial purposes, please contact the authors.
 
 
 
