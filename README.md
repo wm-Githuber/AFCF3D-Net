@@ -43,7 +43,16 @@ Test.py
 # Qualitative Results
 ![SYSU-result](https://user-images.githubusercontent.com/66511993/210714033-e006d556-97d1-47e9-8423-3de7a983f385.png)
 
+# Pre-trained
+The pretrained models can be downloaded at:  
+address：https://pan.baidu.com/s/1Zg_zdMyHIa9V_s3TO-o9pw 
+password：ntjm
+
+# Licence
+The code is released for non-commercial and reseach purposes only. For commercial purposes, please contact the authors.
 
 
 
 # Citation
+If you find this work interesting in your research, please cite our paper as follow:  
+@
