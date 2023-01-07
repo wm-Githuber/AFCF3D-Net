@@ -140,7 +140,6 @@ def main(opt):
 def train(train_loader, model, optimizer, criterion, scheduler, epoch, tool4metric, train_record, row, col):
     tool4metric.clear()
     model.train()
-#    train_metrics = initialize_metrics()
     loss_record = AvgMeter()
     for i, pack in enumerate(train_loader, start=1):
         optimizer.zero_grad()
@@ -172,12 +171,6 @@ def train(train_loader, model, optimizer, criterion, scheduler, epoch, tool4metr
 
         tool4metric.update_cm(pr=bin_preds_mask, gt=mask)
 
-        # gts_temp = gts.data.cpu().numpy().flatten()
-        # prs_temp = bin_preds_mask.reshape(bin_preds_mask.shape[1] * bin_preds_mask.shape[2] * bin_preds_mask.shape[0])
-        # cd_train_report = prfs(prs_temp, gts_temp, average='binary', pos_label=1)
-        # train_metrics = set_metrics(train_metrics, cd_train_report,)
-        # mean_train_metrics = get_mean_metrics(train_metrics)
-
         if i % 100 == 0 or i == len(train_loader):
             print('Epoch [{:03d}/{:03d}], Step [{:04d}/{:04d}],'
                   'Loss: {:.4f}'.format(epoch, opt.epochs, i, len(train_loader), loss_record.show()))
@@ -201,7 +194,6 @@ def val(val_loader, model, criterion, epoch, tool4metric, val_record, row, col):
     model.eval()
     tool4metric.clear()
     loss_record = AvgMeter()
-    # val_metrics = initialize_metrics()
     with torch.no_grad():
         for i, pack in enumerate(val_loader):
             imageA, imageB, gts = pack
@@ -213,7 +205,6 @@ def val(val_loader, model, criterion, epoch, tool4metric, val_record, row, col):
             images = torch.cat([imageA, imageB], 2)
 
             pred_s  = model(images)
-            # pred_s = model(images)
             pred_s = pred_s.squeeze(1)
 
             loss1 = criterion(pred_s, gts)
@@ -223,13 +214,6 @@ def val(val_loader, model, criterion, epoch, tool4metric, val_record, row, col):
             mask = gts.to('cpu').numpy().astype(int)
             tool4metric.update_cm(pr=bin_preds_mask, gt=mask)
             loss_record.update(loss.data, opt.batchsize)
-
-            # gts_temp = gts.data.cpu().numpy().flatten()
-            # prs_temp = bin_preds_mask.reshape(
-            #     bin_preds_mask.shape[1] * bin_preds_mask.shape[2] * bin_preds_mask.shape[0])
-            # cd_train_report = prfs(prs_temp, gts_temp, average='binary', pos_label=1)
-            # val_metrics = set_metrics(val_metrics, cd_train_report, )
-            # mean_val_metrics = get_mean_metrics(val_metrics)
 
             if i % 100 == 0 or i == len(val_loader):
                 print('Epoch [{:03d}/{:03d}], Step [{:04d}/{:04d}],'
