@@ -92,7 +92,6 @@ with torch.no_grad():
         imageA = reference.unsqueeze(2)
         imageB = testimg.unsqueeze(2)
         images = torch.cat([imageA, imageB], 2)
-        # generated_mask = model(images)
         generated_mask = model(images)
         generated_mask = generated_mask.squeeze(1)
 
