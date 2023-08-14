@@ -114,8 +114,6 @@ def main(opt):
     row = 1
     col = 0
 
-    # CE = torch.nn.BCEWithLogitsLoss().cuda()
-    # CE = torch.nn.BCELoss()
     CE = BCEDICE_loss
 
     # build optimizer
