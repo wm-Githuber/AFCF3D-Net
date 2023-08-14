@@ -43,15 +43,16 @@ class Bottleneck3d(torch.nn.Module):
     def __init__(self, bottleneck2d):
         super(Bottleneck3d, self).__init__()
 
-        self.conv1 = Decompose.Decompose_conv(bottleneck2d.conv1, time_dim=1, center=True)
+        self.conv1 = Decompose.Decompose_conv(bottleneck2d.conv1, time_dim=3, time_padding=1,
+                                                time_stride=1, center=True)
         self.bn1 = Decompose.Decompose_norm(bottleneck2d.bn1)
 
         self.conv2 = Decompose.Decompose_conv(bottleneck2d.conv2, time_dim=3, time_padding=1,
                                                 time_stride=1, center=True)
         self.bn2 = Decompose.Decompose_norm(bottleneck2d.bn2)
 
-        self.conv3 = Decompose.Decompose_conv(bottleneck2d.conv3, time_dim=1, center=True)
-        self.bn3 = Decompose.Decompose_norm(bottleneck2d.bn3)
+        # self.conv3 = Decompose.Decompose_conv(bottleneck2d.conv3, time_dim=1, center=True)
+        # self.bn3 = Decompose.Decompose_norm(bottleneck2d.bn3)
 
         self.relu = torch.nn.ReLU(inplace=True)
 
@@ -72,13 +73,14 @@ class Bottleneck3d(torch.nn.Module):
         out = self.bn2(out)
         out = self.relu(out)
 
-        out = self.conv3(out)
-        out = self.bn3(out)
+        # out = self.conv3(out)
+        # out = self.bn3(out)
 
         if self.downsample is not None:
             residual = self.downsample(x)
 
-        out += residual
+        # out += residual
+        out = out + residual
         out = self.relu(out)
         return out
 
@@ -88,49 +90,6 @@ def Decompose_downsample(downsample2d, time_stride=1):
         Decompose.inflate_conv(downsample2d[0], time_dim=1, time_stride=time_stride, center=True),
         Decompose.Decompose_norm(downsample2d[1]))
     return downsample3d
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
