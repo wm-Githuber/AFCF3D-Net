@@ -12,7 +12,7 @@ class Netmodel(nn.Module):
         super(Netmodel, self).__init__()
         # self.resnet = ResNet3D(resnet)
         self.resnet = ResNet18_pure(resnet)
-        # self.decoder = Unet3PP(channel)
+        self.decoder = Unet3PP(channel)
 
     def forward(self, x):
         size = x.size()[3:]
@@ -25,10 +25,10 @@ class Netmodel(nn.Module):
         x3 = self.resnet.layer3(x2)
         x4 = self.resnet.layer4(x3)
 
-        # pred_s = self.decoder(x0, x1, x2, x3, x4)
-        # pred_s = F.upsample(pred_s, size=size, mode='bilinear', align_corners=True)
+        pred_s = self.decoder(x0, x1, x2, x3, x4)
+        pred_s = F.upsample(pred_s, size=size, mode='bilinear', align_corners=True)
 
-        return 1
+        return pred_s
 
 
 class Unet3PP(nn.Module):
