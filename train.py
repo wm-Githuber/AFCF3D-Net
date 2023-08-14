@@ -1,24 +1,31 @@
+import datetime
+import numpy
 import os
-import argparse
 import copy
-import json
-import os
 import time
-import warnings
-
+import json
+import argparse
 import torch
+import cv2
+import torch.nn as nn
 import torchvision
-import xlsxwriter
+import torch.nn.functional as F
 from torch.utils.data import DataLoader
-
-from model.Networks import Netmodel
-from model.metric_tool import ConfuseMatrixMeter
-from utils.dataset import MyDataset
-
+# from sklearn.metrics import precision_recall_fscore_support as prfs
+# from utils.data import get_loader
 from utils.func import AvgMeter, clip_gradient
-from utils.loss_f import BCEDICE_loss
 from utils.lr_scheduler import get_scheduler
-
+from utils.dataset import MyDataset
+from utils.helper import set_metrics, get_mean_metrics, initialize_metrics
+from utils.losses import get_criterion
+from model.metric_tool import ConfuseMatrixMeter, AverageMeter, get_confuse_matrix
+from model.cd3d import CD3D_Net
+# from model.RD3D_ame import Net_arch
+from model.Conv3D import Net_arch
+from utils.loss_f import BCEDICE_loss
+import xlsxwriter
+import warnings
+from thop import profile
 warnings.filterwarnings("ignore")
 
 
@@ -26,13 +33,20 @@ def parse_option():
     parser = argparse.ArgumentParser()
     # data set
     parser.add_argument('--batchsize', type=int, default=8)
+    parser.add_argument('--trainsize', type=int, default=256)
+    parser.add_argument('--hflip', action='store_true', help='hflip data')
+    parser.add_argument('--vflip', action='store_true', help='vflip data')
     parser.add_argument('--data_dir', type=str, default='E:\\AllData\\LEVERCD\\ABLabel')
     # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\WHU\\ABLabel')
+    # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\CDD\\ABLabel')
+    # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\CD_Data_GZ\\ABlabel')
+    # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\WHU_dataset\\ABLabel')
     # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\SYSU-CD\\ABLable')
-
+    # training
+    parser.add_argument('--model', type=str, default='RD3D+', help='RD3D or RD3D+')
     parser.add_argument('--epochs', type=int, default=100, help='epoch number')
     parser.add_argument('--optim', type=str, default='adamW', help='optimizer')
-    parser.add_argument('--lr', type=float, default=0.0001, help='learning rate')
+    parser.add_argument('--lr', type=float, default=0.0001, help='learning rate')       # ori_lr: 0.0001
     parser.add_argument('--lr_scheduler', type=str, default='cosine', choices=['step', 'cosine'])
     parser.add_argument('--warmup_epoch', type=int, default=-1, help='warmup epoch')
     parser.add_argument('--warmup_multiplier', type=int, default=100, help='warmup multiplier')
@@ -50,7 +64,7 @@ def parse_option():
 
     opt, unparsed = parser.parse_known_args()
     opt.output_dir = os.path.join(opt.output_dir, str(int(time.time())))
-
+    # opt.output_dir = os.path.join(opt.output_dir, f'/{datetime.datetime.now().strftime("%Y%m%d-%H%M%S")}/')
     return opt
 
 def build_loader(opt):
@@ -61,8 +75,9 @@ def build_loader(opt):
     return train_loader, val_loader
 
 def build_model(opt):
-    resnet = torchvision.models.resnet50(pretrained=True)
-    model = Netmodel(32, copy.deepcopy(resnet))
+    resnet = torchvision.models.resnet18(pretrained=True)
+    # model = CD3D_Net(32, copy.deepcopy(resnet))
+    model = Net_arch(32, copy.deepcopy(resnet))
     model = model.cuda()
     return model
 
@@ -81,7 +96,7 @@ def main(opt):
     print("Number of model parameters {}".format(parameters_tot))
 
     # 定义写出行列号
-    train_hook = xlsxwriter.Workbook('WHU_0-0001_train.xlsx')
+    train_hook = xlsxwriter.Workbook('WHU_0-001_train.xlsx')
     train_record = train_hook.add_worksheet()
     train_record.write('A1', 'epoch')
     train_record.write('B1', 'Pre')
@@ -90,7 +105,7 @@ def main(opt):
     train_record.write('E1', 'IoU')
     train_record.write('F1', 'acc')
     train_record.write('G1', 'loss')
-    val_hook = xlsxwriter.Workbook('WHU_0-0001_val.xlsx')
+    val_hook = xlsxwriter.Workbook('WHU_0-001_val.xlsx')
     val_record = val_hook.add_worksheet()
     val_record.write('A1', 'epoch')
     val_record.write('B1', 'Pre')
@@ -102,6 +117,8 @@ def main(opt):
     row = 1
     col = 0
 
+    # CE = torch.nn.BCEWithLogitsLoss().cuda()
+    # CE = torch.nn.BCELoss()
     CE = BCEDICE_loss
 
     # build optimizer
@@ -125,21 +142,22 @@ def main(opt):
         print('begin val')
         val(val_loader, model, CE, epoch, tool4metric, val_record, row, col)
         print('epoch {}, total time {:.2f}'.format(epoch, (time.time() - tic)))
-        if epoch >= 80:
-            torch.save(model.state_dict(), os.path.join(opt.output_dir, f"model3D_{epoch}_ckpt.pth"))
-            print("model saved {}!".format(os.path.join(opt.output_dir, f"model3D_{epoch}_ckpt.pth")))
+        if epoch >= 30:
+            torch.save(model.state_dict(), os.path.join(opt.output_dir, f"RD3D_{epoch}_ckpt.pth"))
+            print("model saved {}!".format(os.path.join(opt.output_dir, f"RD3D_{epoch}_ckpt.pth")))
         row = row + 1
 
-    torch.save(model.state_dict(), os.path.join(opt.output_dir, f"model3D_last_ckpt.pth"))
-    print("model saved {}!".format(os.path.join(opt.output_dir, f"model3D_ckpt.pth")))
+    torch.save(model.state_dict(), os.path.join(opt.output_dir, f"RD3D_last_ckpt.pth"))
+    print("model saved {}!".format(os.path.join(opt.output_dir, f"RD3D_ckpt.pth")))
     train_hook.close()
     val_hook.close()
-    os.path.join(opt.output_dir, f"model3D_last_ckpt.pth")
+    os.path.join(opt.output_dir, f"RD3D_last_ckpt.pth")
 
 
 def train(train_loader, model, optimizer, criterion, scheduler, epoch, tool4metric, train_record, row, col):
     tool4metric.clear()
     model.train()
+#    train_metrics = initialize_metrics()
     loss_record = AvgMeter()
     for i, pack in enumerate(train_loader, start=1):
         optimizer.zero_grad()
@@ -152,13 +170,14 @@ def train(train_loader, model, optimizer, criterion, scheduler, epoch, tool4metr
         imageB = imageB.unsqueeze(2)
         images = torch.cat([imageA, imageB], 2)
 
-        # flops, params = profile(model, (images,))
+        # flops, params = profile(model, (imageA, imageB,))
         # print('flops:', flops, 'params:', params)
         # print('flops: %.2f M, params: %.2f M' % (flops / 1000000000.0, params / 1000000.0))
 
         # forward
         pred_s = model(images)
-        pred_s = pred_s.squeeze(1)
+        # pred_s = pred_s.squeeze(1)
+        gts = torch.unsqueeze(gts, dim=1)
         loss = criterion(pred_s, gts)
         loss.backward()
         clip_gradient(optimizer, opt.clip)
@@ -169,7 +188,18 @@ def train(train_loader, model, optimizer, criterion, scheduler, epoch, tool4metr
         bin_preds_mask = (pred_s.to('cpu') > 0.5).detach().numpy().astype(int)
         mask = gts.to('cpu').numpy().astype(int)
 
+        # out_png = bin_preds_mask.squeeze(0)
+        # out_mask = mask.squeeze(0)
+        # cv2.imwrite('./pred.png', out_png)
+        # cv2.imwrite('./mask.png', out_mask)
+
         tool4metric.update_cm(pr=bin_preds_mask, gt=mask)
+
+        # gts_temp = gts.data.cpu().numpy().flatten()
+        # prs_temp = bin_preds_mask.reshape(bin_preds_mask.shape[1] * bin_preds_mask.shape[2] * bin_preds_mask.shape[0])
+        # cd_train_report = prfs(prs_temp, gts_temp, average='binary', pos_label=1)
+        # train_metrics = set_metrics(train_metrics, cd_train_report,)
+        # mean_train_metrics = get_mean_metrics(train_metrics)
 
         if i % 100 == 0 or i == len(train_loader):
             print('Epoch [{:03d}/{:03d}], Step [{:04d}/{:04d}],'
@@ -182,6 +212,10 @@ def train(train_loader, model, optimizer, criterion, scheduler, epoch, tool4metr
     # print("precision for epoch {} is {}".format(epoch, scores_dictionary["precision"]))
     # print("recall for epoch {} is {}".format(epoch, scores_dictionary["recall"]))
     print('---------------------------------------------')
+    # print('pre of prfs is {}'.format(mean_train_metrics['cd_precisions']))
+    # print('recall of prfs is {}'.format(mean_train_metrics['cd_recalls']))
+    # print('F1 of prfs is {}'.format(mean_train_metrics['cd_f1scores']))
+    # print("EPOCH {} TRAIN METRICS".format(epoch) + str(mean_train_metrics))
     train_record.write(row, col, epoch)
     train_record.write(row, col + 1, scores_dictionary['precision'])
     train_record.write(row, col + 2, scores_dictionary['recall'])
@@ -194,18 +228,21 @@ def val(val_loader, model, criterion, epoch, tool4metric, val_record, row, col):
     model.eval()
     tool4metric.clear()
     loss_record = AvgMeter()
+    # val_metrics = initialize_metrics()
     with torch.no_grad():
         for i, pack in enumerate(val_loader):
             imageA, imageB, gts = pack
             imageA = imageA.cuda().float()
             imageB = imageB.cuda().float()
             gts = gts.cuda().float()
+
             imageA = imageA.unsqueeze(2)
             imageB = imageB.unsqueeze(2)
             images = torch.cat([imageA, imageB], 2)
 
-            pred_s  = model(images)
-            pred_s = pred_s.squeeze(1)
+            pred_s = model(images)
+            # pred_s = pred_s.squeeze(1)
+            gts = torch.unsqueeze(gts, dim=1)
 
             loss1 = criterion(pred_s, gts)
             loss = loss1
@@ -214,6 +251,13 @@ def val(val_loader, model, criterion, epoch, tool4metric, val_record, row, col):
             mask = gts.to('cpu').numpy().astype(int)
             tool4metric.update_cm(pr=bin_preds_mask, gt=mask)
             loss_record.update(loss.data, opt.batchsize)
+
+            # gts_temp = gts.data.cpu().numpy().flatten()
+            # prs_temp = bin_preds_mask.reshape(
+            #     bin_preds_mask.shape[1] * bin_preds_mask.shape[2] * bin_preds_mask.shape[0])
+            # cd_train_report = prfs(prs_temp, gts_temp, average='binary', pos_label=1)
+            # val_metrics = set_metrics(val_metrics, cd_train_report, )
+            # mean_val_metrics = get_mean_metrics(val_metrics)
 
             if i % 100 == 0 or i == len(val_loader):
                 print('Epoch [{:03d}/{:03d}], Step [{:04d}/{:04d}],'
@@ -226,6 +270,9 @@ def val(val_loader, model, criterion, epoch, tool4metric, val_record, row, col):
         print("precision for epoch {} is {}".format(epoch, scores_dictionary["precision"]))
         print("recall for epoch {} is {}".format(epoch, scores_dictionary["recall"]))
         print('---------------------------------------------')
+        # print('pre of prfs is {}'.format(mean_val_metrics['cd_precisions']))
+        # print('recall of prfs is {}'.format(mean_val_metrics['cd_recalls']))
+        # print('F1 of prfs is {}'.format(mean_val_metrics['cd_f1scores']))
         val_record.write(row, col, epoch)
         val_record.write(row, col + 1, scores_dictionary['precision'])
         val_record.write(row, col + 2, scores_dictionary['recall'])
@@ -244,6 +291,22 @@ if __name__ == '__main__':
     print("\n full config save to {}".format(path))
 
     main(opt)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
