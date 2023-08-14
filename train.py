@@ -38,9 +38,6 @@ def parse_option():
     parser.add_argument('--vflip', action='store_true', help='vflip data')
     parser.add_argument('--data_dir', type=str, default='E:\\AllData\\LEVERCD\\ABLabel')
     # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\WHU\\ABLabel')
-    # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\CDD\\ABLabel')
-    # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\CD_Data_GZ\\ABlabel')
-    # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\WHU_dataset\\ABLabel')
     # parser.add_argument('--data_dir', type=str, default='E:\\AllData\\SYSU-CD\\ABLable')
     # training
     parser.add_argument('--model', type=str, default='RD3D+', help='RD3D or RD3D+')
