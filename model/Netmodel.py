@@ -10,8 +10,8 @@ from model.ResNet18 import ResNet18_pure
 class Netmodel(nn.Module):
     def __init__(self, channel, resnet):
         super(Netmodel, self).__init__()
-        # self.resnet = ResNet3D(resnet)
-        self.resnet = ResNet18_pure(resnet)
+        self.resnet = ResNet3D(resnet)
+        # self.resnet = ResNet18_pure(resnet)
         self.decoder = Unet3PP(channel)
 
     def forward(self, x):
