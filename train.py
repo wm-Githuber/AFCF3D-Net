@@ -19,9 +19,9 @@ from utils.dataset import MyDataset
 from utils.helper import set_metrics, get_mean_metrics, initialize_metrics
 from utils.losses import get_criterion
 from model.metric_tool import ConfuseMatrixMeter, AverageMeter, get_confuse_matrix
-from model.cd3d import CD3D_Net
+
 # from model.RD3D_ame import Net_arch
-from model.Conv3D import Net_arch
+from model.Netmodel import Netmodel
 from utils.loss_f import BCEDICE_loss
 import xlsxwriter
 import warnings
@@ -74,7 +74,7 @@ def build_loader(opt):
 def build_model(opt):
     resnet = torchvision.models.resnet18(pretrained=True)
     # model = CD3D_Net(32, copy.deepcopy(resnet))
-    model = Net_arch(32, copy.deepcopy(resnet))
+    model = Netmodel(32, copy.deepcopy(resnet))
     model = model.cuda()
     return model
 
