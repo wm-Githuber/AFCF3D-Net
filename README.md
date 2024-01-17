@@ -50,8 +50,8 @@ The code is released for non-commercial and research purposes only. For commerci
 # Citation
 If you find this work interesting in your research, please cite our paper as follow:  
 @ARTICLE{YeCD,  
-author={Ye, Yuanxin and Wang, Mengmeng and Zhou, Liang and Lei, Guangyang and Fan, Jianwei and Qin, Yao},  
-  journal={IEEE Transactions on Geoscience and Remote Sensing},  
+         author={Ye, Yuanxin and Wang, Mengmeng and Zhou, Liang and Lei, Guangyang and Fan, Jianwei and Qin, Yao},  
+         journal={IEEE Transactions on Geoscience and Remote Sensing},  
   title={Adjacent-Level Feature Cross-Fusion With 3-D CNN for Remote Sensing Image Change Detection},  
   year={2023},  
   volume={61},  
