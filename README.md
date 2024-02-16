@@ -1,6 +1,6 @@
-# Adjacent-level Feature Cross-Fusion with 3D CNN for Remote Sensing Image Change Detection
+# Adjacent-Level Feature Cross-Fusion with 3-D CNN for Remote Sensing Image Change Detection
 
-Here, we provide the official pytorch implementation of the paper "Adjacent-level Feature Cross-Fusion with 3D CNN for Remote Sensing Image Change Detection".
+Here, we provide the official pytorch implementation of the paper "Adjacent-Level Feature Cross-Fusion with 3-D CNN for Remote Sensing Image Change Detection".
 ![Architecture](https://github.com/wm-Githuber/AFCF3D-Net/assets/66511993/9c2681a4-a582-4b73-8133-55f2c5da5dc9)
 
 # Requirements
